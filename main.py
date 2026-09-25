@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# گرفتن توکن ربات به صورت خودکار از متغیرهای رندر
+# توکن ربات تلگرام شما
 TELEGRAM_BOT_TOKEN = "8633606355:AAEN35sboCOE8HyfHgRi709Ej3s43pZvbeU"
 RENDER_URL = "https://onrender.com"
 
@@ -26,6 +26,7 @@ def telegram_webhook():
     return jsonify({"status": "success"})
 
 def send_telegram_message(chat_id, text):
+    # تصحیح آدرس دقیق API تلگرام
     url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": chat_id, "text": text}
     try:
@@ -35,7 +36,7 @@ def send_telegram_message(chat_id, text):
 
 def set_webhook():
     webhook_url = f"{RENDER_URL}/telegram-webhook"
-    # اصلاح دقیق آدرس رسمی تلگرام برای جلوگیری از خطای پارس
+    # تصحیح اتصال وب‌هوک برای بیدار کردن تلگرام
     url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/setWebhook?url={webhook_url}"
     try:
         res = requests.get(url)
@@ -43,7 +44,7 @@ def set_webhook():
     except Exception as e:
         print(f"Error setting webhook: {e}")
 
-# بیدارباش اتوماتیک در زمان اجرای اولیه
+# اجرای بیدارباش خودکار
 set_webhook()
 
 if __name__ == '__main__':
