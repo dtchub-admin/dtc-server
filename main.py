@@ -4,8 +4,15 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# اتصال به ربات تلگرامی شما
+# گرفتن توکن ربات به صورت خودکار از متغیرهای رندر
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+RENDER_URL = "https://onrender.com"
+
+@app.route('/')
+def home():
+    # یک تابع برای فعال‌سازی دستی و خودکار وب‌هوک تلگرام
+    set_webhook()
+    return "DTC Server is Live and Connected to Telegram!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -15,15 +22,30 @@ def telegram_webhook():
         text = update["message"].get("text", "")
 
         if text == "/start":
-            welcome_message = "به پلتفرم بین‌المللی DTC خوش آمدید! 🚀\nسرور پایتون شما با موفقیت فعال شد."
-            send_telegram_message(chat_id, welcome_message)
+            welcome_msg = "به پلتفرم بین‌المللی DTC خوش آمدید! 🚀\nسرور پایتون شما با موفقیت فعال شد و آماده پردازش تسک‌هاست."
+            send_telegram_message(chat_id, welcome_msg)
 
     return jsonify({"status": "success"})
 
 def send_telegram_message(chat_id, text):
     url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/sendMessage"
     payload = {"chat_id": chat_id, "text": text}
-    requests.post(url, json=payload)
+    try:
+        requests.post(url, json=payload)
+    except Exception as e:
+        print(f"Error sending message: {e}")
+
+def set_webhook():
+    webhook_url = f"{RENDER_URL}/telegram-webhook"
+    url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/setWebhook?url={webhook_url}"
+    try:
+        requests.get(url)
+    except Exception as e:
+        print(f"Error setting webhook: {e}")
+
+# بیدارباش اتوماتیک در زمان اجرای اولیه
+set_webhook()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
