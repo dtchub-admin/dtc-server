@@ -1,15 +1,15 @@
+import os
 import requests
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# وارد کردن توکن به صورت کاملاً مستقیم و هاردکد شده بدون دخالت منوهای رندر
 TOKEN = "8633606355:AAEN35sboCOE8HyfHgRi709Ej3s43pZvbeU"
 RENDER_URL = "https://onrender.com"
 
 @app.route('/')
 def home():
-    return "DTC Server is Live and Connected!"
+    return "DTC Server is active!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -25,19 +25,10 @@ def telegram_webhook():
 
     return jsonify({"status": "success"})
 
-# بیدارباش مستقیم با آدرس دهی دستی فرمت استاندارد اینترنت
-def set_webhook():
-    webhook_url = f"{RENDER_URL}/telegram-webhook"
-    target_url = f"https://telegram.org{TOKEN}/setWebhook?url={webhook_url}"
-    try:
-        res = requests.get(target_url)
-        print("Telegram Response:", res.text)
-    except Exception as e:
-        print("Webhook Error:", e)
-
-set_webhook()
+# سرور خودش به محض روشن شدن، دستور بیدارباش را به تلگرام صادر می‌کند
+webhook_url = f"{RENDER_URL}/telegram-webhook"
+requests.get(f"https://telegram.org{TOKEN}/setWebhook?url={webhook_url}")
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
