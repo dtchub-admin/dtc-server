@@ -5,14 +5,12 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # گرفتن توکن ربات به صورت خودکار از متغیرهای رندر
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_BOT_TOKEN = "8633606355:AAEN35sboCOE8HyfHgRi709Ej3s43pZvbeU"
 RENDER_URL = "https://onrender.com"
 
 @app.route('/')
 def home():
-    # یک تابع برای فعال‌سازی دستی و خودکار وب‌هوک تلگرام
-    set_webhook()
-    return "DTC Server is Live and Connected to Telegram!"
+    return "DTC Server is Live and Connected!"
 
 @app.route('/telegram-webhook', methods=['POST'])
 def telegram_webhook():
@@ -37,9 +35,11 @@ def send_telegram_message(chat_id, text):
 
 def set_webhook():
     webhook_url = f"{RENDER_URL}/telegram-webhook"
+    # اصلاح دقیق آدرس رسمی تلگرام برای جلوگیری از خطای پارس
     url = f"https://telegram.org{TELEGRAM_BOT_TOKEN}/setWebhook?url={webhook_url}"
     try:
-        requests.get(url)
+        res = requests.get(url)
+        print(f"Telegram Webhook Response: {res.text}")
     except Exception as e:
         print(f"Error setting webhook: {e}")
 
